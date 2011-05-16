@@ -1,0 +1,57 @@
+= Warchat
+
+This project aims to create a simple ruby interface for connecting to Blizzard's Mobile Guild Chat.
+
+= Features
+
+At the moment there is only a very basic set of features, but the main hurdle of
+authenticating with the mobile armory server is mostly solved.
+
+* SRP authentication
+* Guild Chat
+* Officer Chat
+* Whispers
+* Presence notifications
+
+= Simple Usage example
+
+This is a simple chat client that will let you talk in guild chat and receive messages.
+
+  require 'rubygems'
+  require 'warchat'
+
+  USERNAME = ''
+  PASSWORD = ''
+  CHARACTER_NAME = ''
+  CHARACTER_REALM = ''
+
+  client = Warchat::Chat::Client.new
+
+  client.on_establish = Proc.new do |response|
+    client.character_name = CHARACTER_NAME
+    client.character_realm = CHARACTER_REALM
+    client.login
+  end
+
+  client.on_message = Proc.new do |message|
+    case message.type
+      when Warchat::Chat::Message::CHAT_MSG_TYPE_GUILD_CHAT
+        puts "[Guild] #{message.character_name}: #{message.body}"
+      when Warchat::Chat::Message::CHAT_MSG_TYPE_GUILD_MOTD
+        puts "MOTD: #{message.body}"
+      when Warchat::Chat::Message::CHAT_MSG_TYPE_OFFICER_CHAT
+        puts "[Officer] #{message.character_name}: #{message.body}"
+      when Warchat::Chat::Message::CHAT_MSG_TYPE_WHISPER
+        puts "[Whisper] #{message.character_name}: #{message.body}"
+    end
+  end
+
+  begin
+    client.start(USERNAME,PASSWORD)
+    loop do 
+      msg = gets.chomp 
+      client.message msg,Warchat::Chat::Message::CHAT_MSG_TYPE_GUILD_CHAT
+    end
+  rescue Interrupt => e
+    client.close
+  end

@@ -13,14 +13,15 @@ module Warchat
       CHAT_MSG_TYPE_WHISPER = "whisper"
 
       attr_reader :type,:body,:from_type,:character_id,:from
-
+      
       def initialize response
         @type = response["messageType"]
         @body = response['body']
         @from = response["from"]
-        @from_type = from["chatIdType"]
-
-        @character_id = from["characterId"]
+        if @from
+          @from_type = from["chatIdType"]
+          @character_id = from["characterId"]
+        end
       end
 
       def character_name

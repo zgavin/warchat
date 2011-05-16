@@ -24,7 +24,6 @@ module Warchat
       end
 
       def session_establish response
-        puts 'Session Established'
         on_establish.andand.call(response)
       end
 
@@ -57,27 +56,29 @@ module Warchat
       def chat response
         response.extend(ChatResponse)
         if response.ack?
-          puts("chat ack")
+          
         elsif response.message?
           message = Message.new(response)
           on_message.andand.call(message)
           send("on_message_#{message.type}".to_sym).andand.call(message)
         elsif response.presence?
-          puts
           on_presence.andand.call(Presence.new(response))
         else
           puts "unhandled chat type: #{response.chat_type}"
         end
       end
 
-      def close
+      def close_nonblock
         request = Warchat::Network::Request.new("/chat-logout",:chatSessionId=>@chat_session_id)
         session.send_request(request)
       end
+      
+      def close
+        close_nonblock
+        sleep(0.1) until session.is_closed?
+      end
 
       def keep_alive
-        puts "Sending 'keep-alive'"
-
         request = Warchat::Network::Request("/ah-mail")
         request["r"] = realm
         request["cn"] = name

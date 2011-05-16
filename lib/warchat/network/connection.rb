@@ -38,6 +38,7 @@ module Warchat
           @closed = true
           @socket.close
         end     
+        ([@request_thread,@response_thread]-[Thread.current]).each &:join
       end
 
       def is_closed? 

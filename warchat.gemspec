@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Zachary Gavin"]
   s.email       = ["zgavin@gmail.com"]
   s.homepage    = "http://www.github.com/zgavin/warchat"
-  s.summary     = %q{A simple interface to World of Warcraft Remote Guild Chat}
-  s.description = %q{A simple interface to World of Warcraft Remote Guild Chat}
+  s.summary     = %q{A simple interface to World of Warcraft Remote Guild Chat based off Eike Siewertsen's C# implementation}
+  s.description = %q{A simple interface to World of Warcraft Remote Guild Chat in Ruby.  Supports whispers, guild chat, officer chat, and presence notifications.  Many thanks to Eike Siewertsen (https://github.com/fry) for his work deciphering the protocol.  }
 
   s.rubyforge_project = "warchat"
   

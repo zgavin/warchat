@@ -1,4 +1,5 @@
-module Warchat  module Chat
+module Warchat  
+  module Chat
     module ChatResponse
       def presence?
         chat_type == 'wow_presence'

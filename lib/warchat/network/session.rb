@@ -42,7 +42,11 @@ module Warchat
       end
 
       def close reason=''
-        @connection.andand.close reason
+        @connection.close reason
+      end
+      
+      def is_closed?
+        @connection.is_closed?
       end
       
       def send_request request
@@ -51,12 +55,10 @@ module Warchat
 
       def stage_1 response
         proof = @srp.auth1_proof(response["user"], @password[0..15].upcase, response["salt"], response["B"])
-        puts("sending client proof: 0x#{@srp.unpack_int(proof).to_s(16)} length: #{proof.length}")
         send_request(Request.new("/authenticate2",:clientProof=>proof))
       end
 
       def stage_2 response
-        puts("sending client proof2")
         send_request(Request.new("/authenticate2",:clientProof=>Warchat::ByteString.new("\000")))
       end
       
@@ -66,7 +68,6 @@ module Warchat
       end
 
       def connection_receive response
-        puts response.inspect
         m = "stage_#{response['stage']}".to_sym
         if response.ok?
           respond_to? m and send(m,response) or on_receive.andand.call(response)
