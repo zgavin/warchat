@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Zachary Gavin"]
   s.email       = ["zgavin@gmail.com"]
   s.homepage    = "http://www.github.com/zgavin/warchat"
-  s.summary     = %q{A simple interface to the World of Warcraft Remote Guild Chat}
-  s.description = %q{A simple interface to the World of Warcraft Remote Guild Chat}
+  s.summary     = %q{A simple interface to World of Warcraft Remote Guild Chat}
+  s.description = %q{A simple interface to World of Warcraft Remote Guild Chat}
 
   s.rubyforge_project = "warchat"
   
