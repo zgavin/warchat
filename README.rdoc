@@ -4,9 +4,6 @@ This project aims to create a simple ruby interface for connecting to Blizzard's
 
 = Features
 
-At the moment there is only a very basic set of features, but the main hurdle of
-authenticating with the mobile armory server is mostly solved.
-
 * SRP authentication
 * Guild Chat
 * Officer Chat
