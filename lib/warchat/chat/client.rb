@@ -28,13 +28,14 @@ module Warchat
       end
 
       def session_receive response
-        send(response.target.gsub('/','').underscore.to_sym,response)
+        m = response.target.gsub('/','').underscore.to_sym
+        send(m,response) if respond_to? m
       end
       
       def login
         request = Warchat::Network::Request.new("/chat-login",:options=>{:mature_filter=>'false'},:n=>character_name,:r=>character_realm)
         session.send_request(request)
-        @timer = Warchat::Timer.new(120,&method(:keep_alive))
+        @timer = Warchat::Timer.new(30,&method(:keep_alive))
       end
 
       def logout
@@ -79,9 +80,7 @@ module Warchat
       end
 
       def keep_alive
-        request = Warchat::Network::Request("/ah-mail")
-        request["r"] = realm
-        request["cn"] = name
+        request = Warchat::Network::Request.new("/ah-mail",:n=>character_name,:r=>character_realm)
         session.send_request(request)
       end
 

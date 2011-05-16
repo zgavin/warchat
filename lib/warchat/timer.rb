@@ -9,7 +9,14 @@ module Warchat  class Timer
       @run = true
       @th = Thread.new do
         while run?
-          do_sleep and handler.call rescue nil
+          if do_sleep 
+            begin
+              handler.call
+            rescue Exception => e
+              puts e.message
+              puts e.backtrace
+            end
+          end
         end
       end
       @th['name'] = 'Timer'
@@ -31,9 +38,10 @@ module Warchat  class Timer
     def do_sleep
       synchronize do @sleeping = true end
       sleep(@interval)
-      synchronize do @sleeping = false end
     rescue
       nil
+    ensure
+      synchronize do @sleeping = false end
     end
 
     def run?
