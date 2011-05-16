@@ -10,6 +10,10 @@ This project aims to create a simple ruby interface for connecting to Blizzard's
 * Whispers
 * Presence notifications
 
+= Acknowledgements
+
+A big thanks to Eike Siewertsen (http://www.github.com/fry), without whom this probably wouldn't be possible.  
+
 = Simple Usage example
 
 This is a simple chat client that will let you talk in guild chat and receive messages.
