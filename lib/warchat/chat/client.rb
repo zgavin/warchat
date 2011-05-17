@@ -60,9 +60,7 @@ module Warchat
           
         elsif response.message?
           message = Message.new(response)
-          on_message and on_message.call(message)
-          m = "on_message_#{message.type}".to_sym
-          send(m) and send(m).call(message)
+          [on_message,send("on_message_#{message.type}".to_sym)].compact.each do |m| m.call(message) end
         elsif response.presence?
           on_presence and on_presence.call(Presence.new(response))
         else
