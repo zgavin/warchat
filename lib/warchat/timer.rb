@@ -1,6 +1,7 @@
 require 'monitor'
 
-module Warchat  class Timer
+module Warchat  
+  class Timer
     def initialize(interval, &handler)
       
       raise ArgumentError, "Illegal interval" if interval < 0

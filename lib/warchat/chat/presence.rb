@@ -10,7 +10,7 @@ module Warchat
       end
 
       def offline?
-        @type.andand.include? 'offline'
+        @type and @type.include? 'offline'
       end
 
       def type 

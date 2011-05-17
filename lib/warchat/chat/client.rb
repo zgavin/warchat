@@ -20,11 +20,11 @@ module Warchat
       end
 
       def session_error response
-        on_fail.andand.call(response["body"]) if response.target == "/chat-login"
+        on_fail and on_fail.call(response["body"]) if response.target == "/chat-login"
       end
 
       def session_establish response
-        on_establish.andand.call(response)
+        on_establish and on_establish.call(response)
       end
 
       def session_receive response
@@ -44,8 +44,8 @@ module Warchat
 
       def chat_logout response
         puts 'Logged out of chat'
-        @timer.andand.stop
-        on_chat_logout.andand.call response
+        @timer and @timer.stop
+        on_chat_logout and on_chat_logout.call response
         session.close
       end
 
@@ -60,10 +60,11 @@ module Warchat
           
         elsif response.message?
           message = Message.new(response)
-          on_message.andand.call(message)
-          send("on_message_#{message.type}".to_sym).andand.call(message)
+          on_message and on_message.call(message)
+          m = "on_message_#{message.type}".to_sym
+          send(m) and send(m).call(message)
         elsif response.presence?
-          on_presence.andand.call(Presence.new(response))
+          on_presence and on_presence.call(Presence.new(response))
         else
           puts "unhandled chat type: #{response.chat_type}"
         end

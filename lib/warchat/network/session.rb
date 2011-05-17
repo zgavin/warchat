@@ -50,7 +50,7 @@ module Warchat
       end
       
       def send_request request
-        @connection.andand.send_request(request)
+        @connection and @connection.send_request(request)
       end
 
       def stage_1 response
@@ -64,13 +64,13 @@ module Warchat
       
       def stage_3 response
         @established = true 
-        on_establish.andand.call(response)
+        on_establish and on_establish.call(response)
       end
 
       def connection_receive response
         m = "stage_#{response['stage']}".to_sym
         if response.ok?
-          respond_to? m and send(m,response) or on_receive.andand.call(response)
+          respond_to? m and send(m,response) or on_receive and on_receive.call(response)
         else
           error = response["body"]
           puts("error: " + error)
@@ -79,7 +79,7 @@ module Warchat
       end
 
       def connection_close reason
-        on_close.andand.call(reason)
+        on_close and on_close.call(reason)
       end
     end
   end

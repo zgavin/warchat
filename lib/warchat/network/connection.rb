@@ -32,7 +32,7 @@ module Warchat
       def close reason = ""
         return if is_closed?
 
-        on_close.andand.call(reason)
+        on_close and on_close.call(reason)
         
         @mutex.synchronize do 
           @closed = true
@@ -54,7 +54,7 @@ module Warchat
       def handle_responses
         until is_closed?
           response = Response.new(@socket)
-          on_receive.andand.call(response) unless is_closed?
+          on_receive and on_receive.call(response) unless is_closed?
           sleep 0.01
         end
       rescue Exception => e
@@ -71,7 +71,7 @@ module Warchat
               unless is_closed?
                 request.stream @socket
                 @socket.flush
-                on_send.andand.call(request) 
+                on_send and on_send.call(request) 
               end
             end
           end

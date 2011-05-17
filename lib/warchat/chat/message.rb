@@ -25,11 +25,11 @@ module Warchat
       end
 
       def character_name
-        @character_id.andand.split(':')[-2]
+        @character_id and @character_id.split(':')[-2]
       end
 
       def realm_id
-        @character_id.andand.split(':').last
+        @character_id and @character_id.split(':').last
       end
     end
   end
