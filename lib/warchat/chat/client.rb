@@ -5,7 +5,7 @@ module Warchat
       attr_accessor :on_message,:on_presence,:on_logout,:on_fail,:on_establish
       attr_accessor :on_message_afk,:on_message_dnd,:on_message_guild_chat,:on_message_motd,:on_message_officer_chat,:on_message_whisper,:on_chat_logout
       
-      attr_reader :session
+      attr_reader :session,:character_name,:character_realm
 
       def initialize
         @session = Warchat::Network::Session.new
@@ -33,11 +33,12 @@ module Warchat
         send(m,response) if respond_to? m
       end
       
-      def login character_name,character_realm
+      def login *args
+        @character_name,@character_realm = args
         [character_name,character_realm].each do |s| s.respond_to? :force_encoding and s.force_encoding(__ENCODING__) end
         request = Warchat::Network::Request.new("/chat-login",:options=>{:mature_filter=>'false'},:n=>character_name,:r=>character_realm)
         session.send_request(request)
-        @timer = Warchat::Timer.new(30,&method(:keep_alive))
+        @timer = Warchat::Timer.new(30) do keep_alive end
       end
 
       def logout
@@ -81,6 +82,7 @@ module Warchat
       end
 
       def keep_alive
+        puts 'keep alive'
         request = Warchat::Network::Request.new("/ah-mail",:n=>character_name,:r=>character_realm)
         session.send_request(request)
       end
@@ -90,8 +92,8 @@ module Warchat
         session.send_request(request)
       end
 
-      def whisper(msg, char_id)
-        request = Warchat::Network::Request.new("/chat-whisper",:to=>char_id,:body=>msg,:chatSessionId=>@chat_session_id)
+      def whisper(msg, name)
+        request = Warchat::Network::Request.new("/chat-whisper",:to=>"character:#{name}:#{character_realm.downcase}",:body=>msg,:chatSessionId=>@chat_session_id)
         session.send_request(request)
       end
     end

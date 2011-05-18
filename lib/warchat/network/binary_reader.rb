@@ -13,7 +13,9 @@ module Warchat
       
       def substream l
         sub = @socket.read(l) 
-        sub << @socket.read(l-sub.length) until sub.length >= l
+        until sub.length >= l
+          sub << @socket.read(l-sub.length)      
+        end
         sub
       end
 
