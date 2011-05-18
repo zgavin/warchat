@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 module Warchat
   module Network
     class BinaryWriter
@@ -79,7 +80,7 @@ module Warchat
       end
 
       def bytes obj
-        @stream.print obj.to_s
+        @stream.print(obj.to_s)
       end
     end  
   end

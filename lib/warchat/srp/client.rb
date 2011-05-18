@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 require 'digest'
 require 'openssl'
 
@@ -13,7 +14,7 @@ module Warchat
       HASH_SIZE = 32
       SESSION_KEY_SIZE = HASH_SIZE * 2
 
-      attr_reader :b,:b_bytes
+      attr_reader :b,:b_bytes,:salt,:user,:password
 
       def modpow(a, n, m) 
         r = 1
@@ -21,12 +22,12 @@ module Warchat
           r = r * a % m if n[0] == 1
           n >>= 1
           return r if n == 0
-          a = a * a % m
+          a = (a ** 2) % m
         end
       end
 
       def pack_int int
-        Warchat::ByteString.new [int.to_s(16).reverse].pack('h*')
+        Warchat::ByteString.new([int.to_s(16).reverse].pack('h*'))
       end
       
       def unpack_int str
@@ -34,11 +35,15 @@ module Warchat
       end
       
       def digest_int s
-        unpack_int(Digest::SHA2.digest(s))
+        unpack_int(digest_str(s))
+      end
+      
+      def digest_str s
+        Digest::SHA2.digest(s).tap do |s| s.respond_to? :force_encoding and s.force_encoding(__ENCODING__) end
       end
       
       def adjust_size str,length
-        str[0..(length-1)].ljust(length,"\000")
+        Warchat::ByteString.new  str[0..(length-1)].ljust(length,"\000")
       end
 
       def random_crypt
@@ -48,14 +53,14 @@ module Warchat
       def hN_xor_hG
         # xor H(N) and H(G)
         return @hN_xor_hG if @hN_xor_hG
-        hN = Digest::SHA2.digest(pack_int(MODULUS))
-        hG = Digest::SHA2.digest(pack_int(G))
+        hN = digest_str(pack_int(MODULUS)).unpack('C*')
+        hG = digest_str(pack_int(G)).unpack('C*')
         
-        @hN_xor_hG = "\000" * HASH_SIZE
+        tmp = []
         
-        HASH_SIZE.times do |i| @hN_xor_hG[i] = (hN[i] ^ hG[i]) end
+        HASH_SIZE.times do |i| tmp[i] = (hN[i] ^ hG[i]) end
           
-        @hN_xor_hG
+        @hN_xor_hG = tmp.pack('C*')
       end
 
       def a
@@ -77,7 +82,7 @@ module Warchat
 
       def x
         # H(salt | H(userHash | : | sessionPassword))
-        @x ||= digest_int(@salt+Digest::SHA2.digest(@user+":"+@password))
+        @x ||= digest_int(@salt+digest_str(@user+":"+@password))
       end
 
       def s
@@ -92,13 +97,18 @@ module Warchat
 
       def auth1_proof user, password, salt, b_bytes
         @b = unpack_int b_bytes
+        
         @b_bytes = adjust_size(b_bytes,MODULUS_SIZE)
         @salt = adjust_size(salt,SALT_SIZE)
         @user = user
         @password = password
 
-        # hash this to generate client proof, H(H(N) xor H(G) | H(userHash) | salt | A | B | K)
-        Warchat::ByteString.new Digest::SHA2.digest(hN_xor_hG+Digest::SHA2.digest(@user)+salt+a_bytes+@b_bytes+session_key)
+        proof
+      end
+      
+      def proof
+         # hash this to generate client proof, H(H(N) xor H(G) | H(userHash) | salt | A | B | K)
+        Warchat::ByteString.new digest_str(hN_xor_hG+digest_str(user)+salt+a_bytes+b_bytes+session_key)
       end
 
       def session_key
@@ -116,7 +126,7 @@ module Warchat
           temp << s_bytes[i*2+offset]
         end
 
-        hash = Digest::SHA2.digest(temp)
+        hash = digest_str(temp)
         HASH_SIZE.times do |i|
           @session_key[i*2] = hash[i]
         end
@@ -126,7 +136,7 @@ module Warchat
           temp << s_bytes[i*2+offset+1]
         end
 
-        hash = Digest::SHA2.digest(temp)
+        hash = digest_str(temp)
         HASH_SIZE.times do |i|
           @session_key[i*2+1] = hash[i]
         end

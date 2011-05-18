@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 module Warchat
   class ByteString < String
   

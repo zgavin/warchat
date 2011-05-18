@@ -29,9 +29,7 @@ This is a simple chat client that will let you talk in guild chat and receive me
   client = Warchat::Chat::Client.new
 
   client.on_establish = Proc.new do |response|
-    client.character_name = CHARACTER_NAME
-    client.character_realm = CHARACTER_REALM
-    client.login
+    client.login CHARACTER_NAME,CHARACTER_REALM
   end
 
   client.on_message = Proc.new do |message|

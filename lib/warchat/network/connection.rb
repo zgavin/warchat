@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 require 'socket'
 require 'thread'
 
@@ -66,7 +67,6 @@ module Warchat
         until is_closed?
           @mutex.synchronize do
             until @queue.empty?
-              
               request = @queue.shift
               unless is_closed?
                 request.stream @socket

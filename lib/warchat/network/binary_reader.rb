@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 module Warchat
   module Network
     class BinaryReader
@@ -11,11 +12,13 @@ module Warchat
       end
       
       def substream l
-        @socket.read l
+        sub = @socket.read(l) 
+        sub << @socket.read(l-sub.length) until sub.length >= l
+        sub
       end
 
       def byte
-        substream 1
+        substream(1)
       end
 
       def string
@@ -23,7 +26,7 @@ module Warchat
       end
 
       def array
-        (1..(int_32)).map &method(:parse_next)
+        (1..(int_32)).map(&method(:parse_next))
       end
 
       def hash

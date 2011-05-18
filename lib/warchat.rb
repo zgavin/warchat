@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 require 'active_support/inflector'
 
 module Warchat  

@@ -1,9 +1,9 @@
+# encoding: ASCII-8BIT
 module Warchat
   module Chat
     class Warchat::Chat::Client
       attr_accessor :on_message,:on_presence,:on_logout,:on_fail,:on_establish
       attr_accessor :on_message_afk,:on_message_dnd,:on_message_guild_chat,:on_message_motd,:on_message_officer_chat,:on_message_whisper,:on_chat_logout
-      attr_accessor :character_name,:character_realm
       
       attr_reader :session
 
@@ -16,6 +16,7 @@ module Warchat
       end
       
       def start username, password
+        [username,password].each do |s| s.respond_to? :force_encoding and s.force_encoding(__ENCODING__) end
         self.session.start(username,password)
       end
 
@@ -32,7 +33,8 @@ module Warchat
         send(m,response) if respond_to? m
       end
       
-      def login
+      def login character_name,character_realm
+        [character_name,character_realm].each do |s| s.respond_to? :force_encoding and s.force_encoding(__ENCODING__) end
         request = Warchat::Network::Request.new("/chat-login",:options=>{:mature_filter=>'false'},:n=>character_name,:r=>character_realm)
         session.send_request(request)
         @timer = Warchat::Timer.new(30,&method(:keep_alive))
@@ -55,11 +57,11 @@ module Warchat
       end
 
       def chat response
-        response.extend(ChatResponse)
+        response.extend(Warchat::Chat::ChatResponse)
         if response.ack?
           
         elsif response.message?
-          message = Message.new(response)
+          message = Warchat::Chat::Message.new(response)
           [on_message,send("on_message_#{message.type}".to_sym)].compact.each do |m| m.call(message) end
         elsif response.presence?
           on_presence and on_presence.call(Presence.new(response))

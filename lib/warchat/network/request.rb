@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 module Warchat
   module Network
     class Request < Hash
@@ -30,7 +31,8 @@ module Warchat
       end
 
       def stream socket
-        writer = BinaryWriter.new socket
+        str_socket = StringSocket.new
+        writer = BinaryWriter.new str_socket
         writer.string(target)
         writer.int_32(@id)
         each do |k,v|
@@ -50,6 +52,7 @@ module Warchat
           writer.byte 0xFF
         end
         writer.byte 0xFF
+        socket.print(str_socket.value)
       end
       
       def inspect
