@@ -15,8 +15,8 @@ module Warchat
             begin
               handler.call
             rescue Exception => e
-              puts e.message
-              puts e.backtrace
+              Warchat.debug e.message
+              Warchat.debug e.backtrace
             end
           end
         end

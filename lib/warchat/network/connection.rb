@@ -59,8 +59,8 @@ module Warchat
           sleep 0.01
         end
       rescue Exception => e
-        puts e.message
-        puts e.backtrace unless e.is_a? IOError
+        Warchat.debug e.message
+        Warchat.debug e.backtrace unless e.is_a? IOError
       end
 
       def handle_requests
@@ -78,8 +78,8 @@ module Warchat
           sleep 0.01
         end
       rescue Exception => e
-        puts e.message
-        puts e.backtrace
+        Warchat.debug e.message
+        Warchat.debug e.backtrace
       end
     end
   end

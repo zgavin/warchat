@@ -74,7 +74,7 @@ module Warchat
           respond_to? m and send(m,response) or on_receive and on_receive.call(response)
         else
           error = response["body"]
-          puts("error: " + error)
+          Warchat.debug("error: " + error)
           close(error) if respond_to? m
         end      
       end

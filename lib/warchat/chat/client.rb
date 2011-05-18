@@ -1,15 +1,16 @@
 # encoding: ASCII-8BIT
 module Warchat
   module Chat
-    class Warchat::Chat::Client
-      attr_accessor :on_message,:on_presence,:on_logout,:on_fail,:on_establish
+    class Client
+      attr_accessor :on_message,:on_presence,:on_logout,:on_fail,:on_establish,:on_presence_change
       attr_accessor :on_message_afk,:on_message_dnd,:on_message_guild_chat,:on_message_motd,:on_message_officer_chat,:on_message_whisper,:on_chat_logout
       
-      attr_reader :session,:character_name,:character_realm
+      attr_reader :session,:character_name,:character_realm,:active_characters
+
 
       def initialize
         @session = Warchat::Network::Session.new
-
+        @active_characters = []
         [:receive,:establish,:error].each do |m| 
           session.send("on_#{m}=".to_sym, method("session_#{m}".to_sym)) 
         end
@@ -38,7 +39,7 @@ module Warchat
         [character_name,character_realm].each do |s| s.respond_to? :force_encoding and s.force_encoding(__ENCODING__) end
         request = Warchat::Network::Request.new("/chat-login",:options=>{:mature_filter=>'false'},:n=>character_name,:r=>character_realm)
         session.send_request(request)
-        @timer = Warchat::Timer.new(30) do keep_alive end
+        @timer = Warchat::Timer.new(60) do keep_alive end
       end
 
       def logout
@@ -46,28 +47,33 @@ module Warchat
       end
 
       def chat_logout response
-        puts 'Logged out of chat'
+        Warchat.debug 'Logged out of chat'
         @timer and @timer.stop
         on_chat_logout and on_chat_logout.call response
         session.close
       end
 
       def chat_login response
-        puts "Logged into chat"
+        Warchat.debug "Logged into chat"
         @chat_session_id = response["chatSessionId"]
+      end
+      
+      def chat_presence presence
+        character = presence.character
+        on_presence and on_presence.call(presence)
       end
 
       def chat response
         response.extend(Warchat::Chat::ChatResponse)
         if response.ack?
-          
+          on_ack and on_ack.call response
         elsif response.message?
           message = Warchat::Chat::Message.new(response)
           [on_message,send("on_message_#{message.type}".to_sym)].compact.each do |m| m.call(message) end
         elsif response.presence?
-          on_presence and on_presence.call(Presence.new(response))
+          chat_presence Warchat::Chat::Presence.new(response)
         else
-          puts "unhandled chat type: #{response.chat_type}"
+          Warchat.debug "unhandled chat type: #{response.chat_type}"
         end
       end
 
@@ -82,7 +88,7 @@ module Warchat
       end
 
       def keep_alive
-        puts 'keep alive'
+        Warchat.debug 'keep alive'
         request = Warchat::Network::Request.new("/ah-mail",:n=>character_name,:r=>character_realm)
         session.send_request(request)
       end

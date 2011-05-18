@@ -37,10 +37,14 @@ module Warchat
         end.flatten(1)]
       end
 
-      {16=>'n',32=>'N',64=>'L_'}.each do |size,directive| 
+      {16=>'n',32=>'N'}.each do |size,directive| 
         define_method "int_#{size}".to_sym do 
           substream(size/8).unpack(directive).first
         end 
+      end
+      
+      def int_64
+        [substream(8).unpack('L_').first].pack('H*').reverse.unpack('H*').first.hex
       end
 
       def boolean
