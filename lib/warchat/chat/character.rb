@@ -1,11 +1,38 @@
 module Warchat
   module Chat
     class Character
+      class << self
+        def find_or_create data
+          find(data['n']).tap do |c| c and c.update(data) end or new(data).tap do |c| mutex.synchronize do characters << c end end
+        end
+        
+        def find data
+          mutex.synchronize do characters.find do |c| c.name == data['n'] and c.realm = data['r'] end end
+        end
+        
+        def mutex
+          @mutex ||= Mutex.new
+        end
+        
+        def characters
+          @characters ||= []
+        end
+        
+        def online_characters 
+          characters.select &:online?
+        end
+      end
+      
       attr_accessor :data
+      
       
       def initialize data
         @data = data
         @count = 0
+      end
+      
+      def update data
+        @data = data
       end
       
       def name

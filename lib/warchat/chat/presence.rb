@@ -8,10 +8,11 @@ module Warchat
       def initialize response
         @response = response
         @type = response["presenceType"]
+        character.respond_to? status.to_sym and character.send status.to_sym
       end
       
       def character
-        @character ||= Character.new @response["character"]
+        @character ||= Character.find_or_create(@response["character"])
       end
       
       def name

@@ -59,7 +59,6 @@ module Warchat
       end
       
       def chat_presence presence
-        
         on_presence and on_presence.call(presence)
       end
 
@@ -71,7 +70,6 @@ module Warchat
           message = Warchat::Chat::Message.new(response)
           [on_message,send("on_message_#{message.type}".to_sym)].compact.each do |m| m.call(message) end
         elsif response.presence?
-          puts response.inspect
           chat_presence Warchat::Chat::Presence.new(response)
         else
           Warchat.debug "unhandled chat type: #{response.chat_type}"
