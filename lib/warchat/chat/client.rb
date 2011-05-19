@@ -2,15 +2,15 @@
 module Warchat
   module Chat
     class Client
-      attr_accessor :on_message,:on_presence,:on_logout,:on_fail,:on_establish,:on_presence_change
+      attr_accessor :on_message,:on_presence,:on_logout,:on_fail,:on_establish,:on_presence_change,:on_ack
       attr_accessor :on_message_afk,:on_message_dnd,:on_message_guild_chat,:on_message_motd,:on_message_officer_chat,:on_message_whisper,:on_chat_logout
       
-      attr_reader :session,:character_name,:character_realm,:active_characters
+      attr_reader :session,:character_name,:character_realm,:online_characters
 
 
       def initialize
         @session = Warchat::Network::Session.new
-        @active_characters = []
+        @online_characters = []
         [:receive,:establish,:error].each do |m| 
           session.send("on_#{m}=".to_sym, method("session_#{m}".to_sym)) 
         end
@@ -59,7 +59,7 @@ module Warchat
       end
       
       def chat_presence presence
-        character = presence.character
+        
         on_presence and on_presence.call(presence)
       end
 
@@ -71,6 +71,7 @@ module Warchat
           message = Warchat::Chat::Message.new(response)
           [on_message,send("on_message_#{message.type}".to_sym)].compact.each do |m| m.call(message) end
         elsif response.presence?
+          puts response.inspect
           chat_presence Warchat::Chat::Presence.new(response)
         else
           Warchat.debug "unhandled chat type: #{response.chat_type}"

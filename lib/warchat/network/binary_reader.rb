@@ -44,7 +44,7 @@ module Warchat
       end
       
       def int_64
-        [substream(8).unpack('L_').first].pack('H*').reverse.unpack('H*').first.hex
+        [substream(8).unpack('L_').first.to_s(16)].pack('H*').reverse.unpack('H*').first.hex
       end
 
       def boolean

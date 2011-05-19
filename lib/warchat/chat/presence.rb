@@ -33,7 +33,7 @@ module Warchat
       end
       
       def inspect
-        "<#{self.class.name} name:#{name.inspect} character:#{character.inspect} type:#{type.inspect}>"
+        "<#{self.class.name} name:#{name.inspect} character:#{character.inspect} status:#{status.inspect} client_type:#{client_type.inspect}>"
       end
     end
   end
