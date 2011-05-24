@@ -15,4 +15,4 @@ module Warchat
   end
 end
 
-[['*.rb'],['network','*.rb'],['srp','*.rb'],['chat','*.rb']].each do |p| Dir.glob(File.join(File.expand_path('../warchat',__FILE__),*p)).each &method(:require) end
+[[],['network'],['srp'],['chat'],['models']].each do |p| Dir.glob(File.join(File.expand_path('../warchat',__FILE__),*(p << '*.rb'))).each &method(:require) end

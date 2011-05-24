@@ -13,24 +13,25 @@ module Warchat
       CHAT_MSG_TYPE_OFFICER_CHAT = "officer_chat"
       CHAT_MSG_TYPE_WHISPER = "whisper"
 
-      attr_reader :type,:body,:from_type,:character_id,:from
+      attr_reader :type,:body
       
       def initialize response
+        @response = response 
         @type = response["messageType"]
         @body = response['body']
-        @from = response["from"]
-        if @from
-          @from_type = from["chatIdType"]
-          @character_id = from["characterId"]
-        end
+        @from = (response["from"] or {})
       end
-
-      def character_name
-        @character_id and @character_id.split(':')[-2]
+      
+      def guild
+        return @guild if @guild or @from["guildId"].nil?
+        _,name,realm = @response['from']["guildId"].split(':')
+        @guild = Warchat::Models::Guild.find_or_create 'n' => name,'r'=>realm
       end
-
-      def realm_id
-        @character_id and @character_id.split(':').last
+      
+      def character
+        return @character if @character or @from["characterId"].nil?
+        _,name,realm = @from["characterId"].split(':')
+        @character = Warchat::Models::Character.find_or_create 'n' => name,'r'=>realm
       end
     end
   end

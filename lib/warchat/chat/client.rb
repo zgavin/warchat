@@ -10,7 +10,6 @@ module Warchat
 
       def initialize
         @session = Warchat::Network::Session.new
-        @online_characters = []
         [:receive,:establish,:error].each do |m| 
           session.send("on_#{m}=".to_sym, method("session_#{m}".to_sym)) 
         end
