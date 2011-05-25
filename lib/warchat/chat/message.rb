@@ -2,10 +2,6 @@
 module Warchat
   module Chat
     class Message
-      CHAT_ID_TYPE_CHARACTER = "character"
-      CHAT_ID_TYPE_GUILD = "guild"
-      CHAT_ID_TYPE_GUILD_MEMBER = "guild_member"
-
       CHAT_MSG_TYPE_AFK = "afk"
       CHAT_MSG_TYPE_DND = "dnd"
       CHAT_MSG_TYPE_GUILD_CHAT = "guild_chat"
@@ -32,6 +28,12 @@ module Warchat
         return @character if @character or @from["characterId"].nil?
         _,name,realm = @from["characterId"].split(':')
         @character = Warchat::Models::Character.find_or_create 'n' => name,'r'=>realm
+      end
+      
+      constants.select do |c| c[0..13] == 'CHAT_MSG_TYPE_' end.map do |c| "Warchat::Chat::Message::#{c}" end.each do |c|
+        define_method "#{c.constantize}?".to_sym do 
+          type == c.constantize
+        end
       end
     end
   end

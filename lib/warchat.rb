@@ -1,5 +1,5 @@
 # encoding: ASCII-8BIT
-require 'active_support/inflector'
+require 'active_support/all'
 
 module Warchat  
   def self.debug message
@@ -15,4 +15,4 @@ module Warchat
   end
 end
 
-[[],['network'],['srp'],['chat'],['models']].each do |p| Dir.glob(File.join(File.expand_path('../warchat',__FILE__),*(p << '*.rb'))).each &method(:require) end
+[[],['network'],['srp'],['chat'],['models']].each do |p| Dir.glob(File.join(File.expand_path('../warchat',__FILE__),*(p << '*.rb')),&method(:require)) end
