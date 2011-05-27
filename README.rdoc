@@ -25,6 +25,10 @@ This is a simple chat client that will let you talk in guild chat and receive me
   PASSWORD = ''
   CHARACTER_NAME = ''
   CHARACTER_REALM = ''
+  HOST = "m.us.wowarmory.com" 
+  #HOST = "m.eu.wowarmory.com"
+  #HOST = "m.kr.wowarmory.com"
+  PORT = 8780
 
   client = Warchat::Chat::Client.new
 
@@ -35,18 +39,18 @@ This is a simple chat client that will let you talk in guild chat and receive me
   client.on_message = Proc.new do |message|
     case message.type
       when Warchat::Chat::Message::CHAT_MSG_TYPE_GUILD_CHAT
-        puts "[Guild] #{message.character_name}: #{message.body}"
+        puts "[Guild] #{message.character.name}: #{message.body}"
       when Warchat::Chat::Message::CHAT_MSG_TYPE_GUILD_MOTD
         puts "MOTD: #{message.body}"
       when Warchat::Chat::Message::CHAT_MSG_TYPE_OFFICER_CHAT
-        puts "[Officer] #{message.character_name}: #{message.body}"
+        puts "[Officer] #{message.character.name}: #{message.body}"
       when Warchat::Chat::Message::CHAT_MSG_TYPE_WHISPER
-        puts "[Whisper] #{message.character_name}: #{message.body}"
+        puts "[Whisper] #{message.character.name}: #{message.body}"
     end
   end
 
   begin
-    client.start(USERNAME,PASSWORD)
+    client.start(USERNAME,PASSWORD,HOST,PORT)
     loop do 
       msg = gets.chomp 
       client.message msg,Warchat::Chat::Message::CHAT_MSG_TYPE_GUILD_CHAT

@@ -13,11 +13,11 @@ module Warchat
         @connection.on_receive = method(:connection_receive)
       end
 
-      def start account_name, password
+      def start account_name, account_password,host="m.us.wowarmory.com",port=8780
         @account_name = account_name
-        @password = password
+        @account_password = account_password
 
-        @connection.start
+        @connection.start host,port
 
         @srp = Warchat::Srp::Client.new
 
@@ -55,7 +55,7 @@ module Warchat
       end
 
       def stage_1 response
-        proof = @srp.auth1_proof(response["user"], @password[0..15].upcase, response["salt"], response["B"])
+        proof = @srp.auth1_proof(response["user"], @account_password[0..15].upcase, response["salt"], response["B"])
         send_request(Request.new("/authenticate2",:clientProof=>proof))
       end
 

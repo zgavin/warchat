@@ -6,19 +6,15 @@ module Warchat
   module Network
     class Connection
 
-      attr_accessor :host,:port,:on_send,:on_receive,:on_close
+      attr_accessor :on_send,:on_receive,:on_close
 
-      def initialize *args
-        options = args.pop if args.last.is_a? Hash
-
-        self.host = (args.shift or "m.us.wowarmory.com")
-        self.port = (args.shift or 8780)
+      def initialize
         @closed = true
         @queue = []
         @mutex = Mutex.new
       end
 
-      def start
+      def start host="m.us.wowarmory.com",port=8780
         close
 
         @closed = false;
