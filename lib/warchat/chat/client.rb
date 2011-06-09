@@ -15,7 +15,7 @@ module Warchat
       end
       
       def start account_name, account_password,host="m.us.wowarmory.com",port=8780
-        [username,password].each do |s| s.respond_to? :force_encoding and s.force_encoding(__ENCODING__) end
+        [account_name,account_password].each do |s| s.respond_to? :force_encoding and s.force_encoding(__ENCODING__) end
         self.session.start(account_name,account_password,host,port)
       end
 
